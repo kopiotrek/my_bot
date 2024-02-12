@@ -1,0 +1,25 @@
+# Quick setup
+# $ xhost local:root
+# $ docker compose -f compose.simulation.yaml up --build
+
+version: '1.0'
+services:
+    my-bot-simulation:
+        build:
+            context: ./
+            dockerfile: docker/simulation/Dockerfile
+        # runtime: nvidia
+        network_mode: host
+        ipc: host
+        environment:
+            - DISPLAY
+            - QT_X11_NO_MITSHM = 1
+            - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}
+            - NVIDIA_VISIBLE_DEVICES=all
+            - NVIDIA_DRIVER_CAPABILITIES=all
+            - ROS_DOMAIN_ID
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - /dev/dri:/dev/dri
+        command: >
+            ros2 launch my_bot launch_sim.launch.py world:=src/worlds/obstacles.world
